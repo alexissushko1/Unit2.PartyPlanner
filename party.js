@@ -33,6 +33,15 @@ async function addEvent(event) {
   }
 }
 
+async function deleteEvent(id) {
+  try {
+    const response = await fetch(API_URL + id, {
+      method: "DELETE",
+    });
+  } catch (error) {
+    console.error(error);
+  }
+}
 
 
 
@@ -51,14 +60,24 @@ async function renderEvents() {
     `<h2>${event.name}</h2>
     <p>${event.description}</p>
     <h3>${eventDate}</h3>
-    <h3>${event.location}</h3>`;
+    <h3>${event.location}</h3>
+    <button>Delete</button>`;
+
+    const button = document.querySelector("button");
+    button.addEventListener("click", async () => {
+      await getEvents();
+      await deleteEvent(events.id);
+      renderEvents();
+    });
     return info;
   });
+  const ul = document.querySelector("ul");
   eventList.replaceChildren(...eventsInfo);
 }
 
 async function render() {
   await getEvents();
+  await deleteEvent(events.id);
   renderEvents();
 }
 //---Script---
@@ -75,6 +94,7 @@ form.addEventListener("submit", async(event) => {
   location: form.location.value,
   };
   await addEvent(individualEvent);
+  await deleteEvent(events.id);
   render();
   form.reset();
 });
