@@ -17,7 +17,21 @@ async function getEvents() {
   }
 }
 
-
+async function addEvent(event) {
+  try {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(artist),
+    });
+    const json = await response.json();
+    if(json.error) {
+      throw new Error(json.error.message);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
 
 
 
@@ -48,3 +62,4 @@ async function render() {
 }
 //---Script---
 render();
+
