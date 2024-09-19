@@ -22,7 +22,7 @@ async function addEvent(event) {
     const response = await fetch(API_URL, {
       method: "POST",
       headers: {"Content-Type": "application/json"},
-      body: JSON.stringify(artist),
+      body: JSON.stringify(event),
     });
     const json = await response.json();
     if(json.error) {
@@ -46,10 +46,11 @@ async function renderEvents() {
 
   const eventsInfo = state.events.map((event) => {
     const info = document.createElement("li");
+    const eventDate = new Date(event.date).toLocaleString();
     info.innerHTML = 
     `<h2>${event.name}</h2>
     <p>${event.description}</p>
-    <h3>${event.date}</h3>
+    <h3>${eventDate}</h3>
     <h3>${event.location}</h3>`;
     return info;
   });
@@ -63,3 +64,17 @@ async function render() {
 //---Script---
 render();
 
+const form = document.querySelector("form");
+form.addEventListener("submit", async(event) => {
+  event.preventDefault();
+  const eventDate = new Date(form.date.value).toISOString();
+  const individualEvent = {
+  name: form.partyName.value,
+  description: form.description.value,
+  date: eventDate,
+  location: form.location.value,
+  };
+  await addEvent(individualEvent);
+  render();
+  form.reset();
+});
