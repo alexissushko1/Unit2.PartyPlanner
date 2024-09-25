@@ -1,100 +1,101 @@
-const COHORT ="2408-Alexis"
-const API_URL = `https://fsa-crud-2aa9294fe819.herokuapp.com/api/${COHORT}/events`;
+const COHORT = "2408-Alexis";
+const API_URL = `https://fsa-crud-2aa9294fe819.herokuapp.com/api/${COHORT}/events/`;
 
 
 //---State---
-const state = {
-  events: [],
+  let parties = [];
+
+const getParties = async () => {
+  try {
+    const response = await fetch(API_URL);
+    const parsed = await response.json();
+    parties = parsed.data;
+  } catch (e) {
+    console.error(e);
+  }
 };
 
-async function getEvents() {
+  const addParty = async(party) => {
   try {
-    const response = await fetch (API_URL);
-    const responseObj = await response.json();
-    state.events = responseObj.data;
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-async function addEvent(event) {
-  try {
-    const response = await fetch(API_URL, {
+      const response = await fetch(API_URL, {
       method: "POST",
       headers: {"Content-Type": "application/json"},
-      body: JSON.stringify(event),
+      body: JSON.stringify(party),
     });
-    const json = await response.json();
-    if(json.error) {
-      throw new Error(json.error.message);
+    if(!response.ok) {
+      const parsed = await response.json();
+      throw new Error(parsed.error.message);
     }
-  } catch (error) {
-    console.error(error);
+  } catch (e) {
+    console.error(e);
   }
-}
+};
 
-async function deleteEvent(id) {
+    const deleteParty = async (id) => {
   try {
     const response = await fetch(API_URL + id, {
       method: "DELETE",
     });
-  } catch (error) {
-    console.error(error);
+    
+    if(!response.ok) {
+      const parsed = await response.json();
+      throw new Error(parsed.error.message);
+    }
+  } catch(e) {
+    console.error(e);
   }
 }
 
 
 
 //---Render---
-async function renderEvents() {
-  const eventList = document.querySelector("#events");
-  if (!state.events.length) {
-    eventList.innerHtml = "<li>No events</li>";
+ const renderParties = () => {
+  const $partyList = document.querySelector("#parties");
+  if (!parties.length) {
+    $partyList.innerHtml = "<li>No parties</li>";
     return;
   }
 
-  const eventsInfo = state.events.map((event) => {
-    const info = document.createElement("li");
-    const eventDate = new Date(event.date).toLocaleString();
-    info.innerHTML = 
-    `<h2>${event.name}</h2>
-    <p>${event.description}</p>
-    <h3>${eventDate}</h3>
-    <h3>${event.location}</h3>
+  const $parties = parties.map((party) => {
+    const $li = document.createElement("li");
+    const partyDate = new Date(party.date).toLocaleString();
+    $li.innerHTML = 
+    `<h2>${party.name}</h2>
+    <p>${party.description}</p>
+    <h3>${partyDate}</h3>
+    <h3>${party.location}</h3>
     <button>Delete</button>`;
 
-    const button = document.querySelector("button");
-    button.addEventListener("click", async () => {
-      await getEvents();
-      await deleteEvent(events.id);
-      renderEvents();
+    const $button = $li.querySelector("button");
+    $button.addEventListener("click", async(event) => {
+      await deleteParty(party.id);
+      await getParties();
+      renderParties();
     });
-    return info;
+    return $li;
   });
-  const ul = document.querySelector("ul");
-  eventList.replaceChildren(...eventsInfo);
+  $partyList.replaceChildren(...$parties);
 }
 
-async function render() {
-  await getEvents();
-  await deleteEvent(events.id);
-  renderEvents();
-}
+  const init = async () => {
+  await getParties();
+  renderParties();
+};
 //---Script---
-render();
+init();
 
-const form = document.querySelector("form");
-form.addEventListener("submit", async(event) => {
+const $form = document.querySelector("form");
+$form.addEventListener("submit", async(event) => {
   event.preventDefault();
-  const eventDate = new Date(form.date.value).toISOString();
-  const individualEvent = {
-  name: form.partyName.value,
-  description: form.description.value,
-  date: eventDate,
-  location: form.location.value,
+  const partyDate = new Date($form.date.value).toISOString();
+  const party = {
+  name: $form.name.value,
+  description: $form.description.value,
+  date: partyDate,
+  location: $form.location.value,
   };
-  await addEvent(individualEvent);
-  await deleteEvent(events.id);
-  render();
-  form.reset();
+  await addParty(party);
+  await getParties();
+  renderParties();
+  $form.reset();
 });
