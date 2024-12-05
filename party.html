@@ -10,23 +10,25 @@
   <body>
     <h1>Parties</h1>
     <form id="addParty">
+      <h2>Add a Party</h2>
       <label>
-        Event
-        <input type="text" name="partyName" />
+        Name
+        <input type="text" name="name" />
       </label>
       <label>
         Description
-        <inputy type="text" name="description" />
+        <input type="text" name="description" />
       </label>
       <label>
         Date and Time
-        <input type="text" name="date-and-time" />
+        <input type="datetime-local" name="date" />
       </label>
       <label>
         Location
         <input type="text" name="location" />
       </label>
+      <button>Add Party</button>
     </form>
-    <ul id="events"></ul>
+    <ul id="parties"></ul>
   </body>
 </html>
